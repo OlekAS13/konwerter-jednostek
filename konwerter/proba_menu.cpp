@@ -46,6 +46,27 @@ string menu_conversion[] = {
     "Wyjscie"
 };
 
+string menu_favorites[] = {
+    "[ULUBIONE KONWERSJE]",
+    "Puste",
+    "Puste",
+    "Puste",
+    "Puste",
+    "Puste",
+    "Dodaj / Modyfikuj",
+    "Usun",
+    "Wyjscie"
+};
+
+int favourites_conversions[5][2] = { // 5 ulubionych pozycji jako tablica 2-elementowa: {kategoria, konwersja}
+    {1, 1},
+    {2, 3},
+    {0, 0},
+    {0, 0},
+    {3, 2}
+};
+
+
 void convert_length(double value, int unit, double out[4]) {
     double length_factor[4] = {1.0, 0.0254, 1609.34, 1000};
     unit--; // bo przeliczniki indeksujemy od 0, natomiast menu mamy indeksowane od 1
@@ -127,7 +148,11 @@ void display_temperatures(double temperatures[], string unit) {
     cin.get();
 }
 
-int getMenu(string menu[], int max_pos) {
+void convert_time() {
+    
+}
+
+int getMenu(string menu[], int max_pos, string prompt = ">> ") {
 	int choice;
 
     cout << "\033[2J\033[H";
@@ -139,8 +164,8 @@ int getMenu(string menu[], int max_pos) {
 	}
 
     cout << "\n\n======================";
-	cout << "\033[1A";
-    cout << "\r>> ";
+	cout << "\033[1A\r";
+    cout << prompt;
 
 	cin >> choice;
 
@@ -164,12 +189,13 @@ double getValue(string unit) {
     return value;
 }
 
-void conversion_lenghts() {
-    int choice;
+void conversion_lenghts(int choice = -1) {
     double value;
     double lengths[4];
 
-    choice = getMenu(menu_length, 5);
+    if (choice == -1) {
+        choice = getMenu(menu_length, 5);
+    }
 
     value = getValue(menu_length[choice]);
 
@@ -177,12 +203,13 @@ void conversion_lenghts() {
     display_lengths(lengths, menu_length[choice]);
 }
 
-void conversion_masses() {
-    int choice;
+void conversion_masses(int choice = -1) {
     double value;
     double masses[4];
 
-    choice = getMenu(menu_mass, 5);
+    if (choice == -1) {
+        choice = getMenu(menu_mass, 5);
+    }
 
     value = getValue(menu_mass[choice]);
 
@@ -190,12 +217,13 @@ void conversion_masses() {
     display_masses(masses, menu_mass[choice]);
 }
 
-void conversion_temperatures() {
-    int choice;
+void conversion_temperatures(int choice = -1) {
     double value;
     double temperatures[3];
 
-    choice = getMenu(menu_temperature, 4);
+    if (choice == -1) {
+        choice = getMenu(menu_temperature, 4);
+    }
 
     value = getValue(menu_temperature[choice]);
 
@@ -207,8 +235,117 @@ void history() {
 
 }
 
-void favourites() {
+void update_favorites_menu() {
+    for (int i = 0; i < 5; i++) {
+        switch (favourites_conversions[i][0]) {
+            case 1:
+                menu_favorites[i + 1] = menu_length[favourites_conversions[i][1]];
+                break;
+            case 2:
+                menu_favorites[i + 1] = menu_mass[favourites_conversions[i][1]];
+                break;
+            case 3:
+                menu_favorites[i + 1] = menu_temperature[favourites_conversions[i][1]];
+                break;
+            default:
+                menu_favorites[i + 1] = "Puste";
+                break;
+        }
+    }
+}
 
+void modify_favorites() {
+    int choice;
+    
+    choice = getMenu(menu_favorites, 6, "Modyfikuj >> ");
+    
+    if (choice >= 1 && choice <= 5) {
+        int category = getMenu(menu_conversion, 10, "Kategoria >> ");
+        int conversion;
+
+        switch (category) {
+            case 1:
+                conversion = getMenu(menu_length, 5, "Konwersja >> ");
+                break;
+            case 2:
+                conversion = getMenu(menu_mass, 5, "Konwersja >> ");
+                break;
+            case 3:
+                conversion = getMenu(menu_temperature, 4, "Konwersja >> ");
+                break;
+            default:
+                cout << "\a";
+                return;
+        }
+
+        favourites_conversions[choice - 1][0] = category;
+        favourites_conversions[choice - 1][1] = conversion;
+    }
+
+    update_favorites_menu();
+}
+
+void delete_favorites() {
+    int choice;
+
+    choice = getMenu(menu_favorites, 6, "Usun >> ");
+
+    if (choice >= 1 && choice <= 5) {
+        favourites_conversions[choice - 1][0] = 0;
+        favourites_conversions[choice - 1][1] = 0;
+    }
+
+    update_favorites_menu();
+}
+
+void favourites_main() {
+    int menu;
+
+    // aktualizujemy menu ulubionych
+    update_favorites_menu();
+
+    do {
+        menu = getMenu(menu_favorites, 9);
+        switch(menu) {
+            case 1: 
+            case 2: 
+            case 3: 
+            case 4: 
+            case 5:
+                if (favourites_conversions[menu - 1][0] == 0) {
+                    cout << "\a";
+                    break;
+                }
+                switch (favourites_conversions[menu - 1][0]) {
+                    case 1:
+                        conversion_lenghts(favourites_conversions[menu - 1][1]);
+                        break;
+                    case 2:
+                        conversion_masses(favourites_conversions[menu - 1][1]);
+                        break;
+                    case 3:
+                        conversion_temperatures(favourites_conversions[menu - 1][1]);
+                        break;
+                    default:
+                        cout << "\a";
+                        break;
+                }
+                break;
+            case 6:
+                // Dodaj / Modyfikuj
+                modify_favorites();
+                break;
+            case 7:
+                // Usun
+                delete_favorites();
+                break;
+            case 8:
+                break;
+            default:
+                cout << "\a";
+                break;
+        }
+    } while (menu != 8);
 }
 
 void conversion_main() {
@@ -247,7 +384,7 @@ int main() {
                 history();
                 break;
             case 3:
-                favourites();
+                favourites_main();
                 break;
             case 4:
                 break;
