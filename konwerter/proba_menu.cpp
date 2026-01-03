@@ -3,6 +3,8 @@
 
 using namespace std;
 
+bool batch_mode = false;
+
 string menu_length[] = {
     "[KONWERSJA DLUGOSCI]",
 	"Metry",
@@ -30,6 +32,7 @@ string menu_main[] = {
     "Konwertowanie",
     "Historia",
     "Ulubione",
+    "Tryb wsadowy: WYL",
     "Wyjscie"
 };
 
@@ -68,8 +71,33 @@ int favourites_conversions[5][2] = { // 5 ulubionych pozycji jako tablica 2-elem
 };
 
 void save_history(string line) {
-    ofstream history("historia_konwersji.txt", ios::app);
-    history << line << endl;
+    ofstream history_file("conversion_history.txt", ios::app);
+    history_file << line << endl;
+
+    history_file.close();
+}
+
+void history_main() {
+    ifstream history_file("conversion_history.txt");
+    string line;
+
+    cout << "\033[2J\033[H";
+
+    cout << "======================\n";
+    cout << "[HISTORIA KONWERSJI]\n\n";
+    
+    while (getline(history_file, line)) {
+        cout << line << endl;
+    }
+
+    cout << "\n\n======================\n";
+    cout << "\033[2A";
+    cout << "\rEnter aby wyjsc... ";
+
+    cin.ignore();
+    cin.get();
+
+    history_file.close();
 }
 
 void convert_length(double value, int unit, double out[4]) {
@@ -160,7 +188,7 @@ void convert_time() {
 
 }
 
-int getMenu(string menu[], int max_pos, string prompt = ">> ") {
+int get_menu(string menu[], int max_pos, string prompt = ">> ") {
 	int choice;
 
     do {
@@ -186,7 +214,7 @@ int getMenu(string menu[], int max_pos, string prompt = ">> ") {
 	return choice;
 }
 
-double getValue(string unit) {
+double get_value(string unit) {
     double value;
 
     cout << "\033[2J\033[H";
@@ -203,18 +231,57 @@ double getValue(string unit) {
     return value;
 }
 
+string get_filename() {
+    string filename;
+
+    cout << "\033[2J\033[H";
+
+    cout << "======================\n";
+    cout << "[NAZWA PLIKU]\n\n";
+    cout << "======================";
+
+    cout << "\033[1A";
+    cout << "\rPodaj nazwe pliku >> ";
+
+    cin >> filename;
+
+    return filename;
+}
+
 void conversion_lenghts(int choice = -1) {
+    string filename;
     double value;
     double lengths[4];
 
     if (choice == -1) {
-        choice = getMenu(menu_length, 5);
+        choice = get_menu(menu_length, 5);
     }
 
-    value = getValue(menu_length[choice]);
+    if (!batch_mode) {
+        value = get_value(menu_length[choice]);
 
-    convert_length(value, choice, lengths);
-    display_lengths(lengths, menu_length[choice]);
+        convert_length(value, choice, lengths);
+        display_lengths(lengths, menu_length[choice]);
+    }
+    else {
+        filename = get_filename();
+
+        ifstream batch_file_input(filename);
+        ofstream batch_file_output("out_" + filename);
+
+        string line;
+        
+        while (getline(batch_file_input, line)) {
+            value = stod(line);
+
+            convert_length(value, choice, lengths);
+            batch_file_output << lengths[0] << ";" << lengths[1] << ";" << lengths[2] << ";" << lengths[3] << endl;
+            save_history("[KONWERSJA WSADOWA - " + menu_length[choice] + "] Metry: " + to_string(lengths[0]) + "; Cale: " + to_string(lengths[1]) + "; Mile: " + to_string(lengths[2]) + "; Kilometry: " + to_string(lengths[3]));
+        }
+
+        batch_file_input.close();
+        batch_file_output.close();
+    }
 }
 
 void conversion_masses(int choice = -1) {
@@ -222,10 +289,10 @@ void conversion_masses(int choice = -1) {
     double masses[4];
 
     if (choice == -1) {
-        choice = getMenu(menu_mass, 5);
+        choice = get_menu(menu_mass, 5);
     }
 
-    value = getValue(menu_mass[choice]);
+    value = get_value(menu_mass[choice]);
 
     convert_mass(value, choice, masses);
     display_masses(masses, menu_mass[choice]);
@@ -236,10 +303,10 @@ void conversion_temperatures(int choice = -1) {
     double temperatures[3];
 
     if (choice == -1) {
-        choice = getMenu(menu_temperature, 4);
+        choice = get_menu(menu_temperature, 4);
     }
 
-    value = getValue(menu_temperature[choice]);
+    value = get_value(menu_temperature[choice]);
 
     convert_temperature(value, choice, temperatures);
     display_temperatures(temperatures, menu_temperature[choice]);
@@ -271,21 +338,21 @@ void update_favorites_menu() {
 void modify_favorites() {
     int choice;
 
-    choice = getMenu(menu_favorites, 6, "Modyfikuj >> ");
+    choice = get_menu(menu_favorites, 6, "Modyfikuj >> ");
 
     if (choice >= 1 && choice <= 5) {
-        int category = getMenu(menu_conversion, 10, "Kategoria >> ");
+        int category = get_menu(menu_conversion, 10, "Kategoria >> ");
         int conversion;
 
         switch (category) {
             case 1:
-                conversion = getMenu(menu_length, 5, "Konwersja >> ");
+                conversion = get_menu(menu_length, 5, "Konwersja >> ");
                 break;
             case 2:
-                conversion = getMenu(menu_mass, 5, "Konwersja >> ");
+                conversion = get_menu(menu_mass, 5, "Konwersja >> ");
                 break;
             case 3:
-                conversion = getMenu(menu_temperature, 4, "Konwersja >> ");
+                conversion = get_menu(menu_temperature, 4, "Konwersja >> ");
                 break;
             default:
                 cout << "\a";
@@ -302,7 +369,7 @@ void modify_favorites() {
 void delete_favorites() {
     int choice;
 
-    choice = getMenu(menu_favorites, 6, "Usun >> ");
+    choice = get_menu(menu_favorites, 6, "Usun >> ");
 
     if (choice >= 1 && choice <= 5) {
         favourites_conversions[choice - 1][0] = 0;
@@ -319,7 +386,7 @@ void favourites_main() {
     update_favorites_menu();
 
     do {
-        menu = getMenu(menu_favorites, 9);
+        menu = get_menu(menu_favorites, 9);
         switch(menu) {
             case 1:
             case 2:
@@ -366,7 +433,7 @@ void conversion_main() {
     int menu;
 
     do {
-        menu = getMenu(menu_conversion, 11);
+        menu = get_menu(menu_conversion, 11);
         switch(menu) {
             case 1:
                 conversion_lenghts();
@@ -391,6 +458,8 @@ void save_favorites() {
     for (int i = 0; i < 5; i++) {
         favourites_file << favourites_conversions[i][0] << " " << favourites_conversions[i][1] << endl;
     }
+
+    favourites_file.close();
 }
 
 void load_favourites() {
@@ -399,6 +468,8 @@ void load_favourites() {
     for (int i = 0; i < 5; i++) {
         favourites_file >> favourites_conversions[i][0] >> favourites_conversions[i][1];
     }
+
+    favourites_file.close();
 }
 
 int main() {
@@ -407,24 +478,29 @@ int main() {
     load_favourites();
 
     do {
-        menu = getMenu(menu_main, 5);
+        menu = get_menu(menu_main, 6);
         switch(menu) {
             case 1:
                 conversion_main();
                 break;
             case 2:
-                history();
+                history_main();
                 break;
             case 3:
                 favourites_main();
                 break;
             case 4:
+                //if (batch_mode) menu_main[4] = "Tryb wsadowy: WYL"; else menu_main[4] = "Tryb wsadowy: WL";
+                menu_main[4] = (batch_mode) ? "Tryb wsadowy: WYL" : "Tryb wsadowy: WL";
+                batch_mode = !batch_mode;
+                break;
+            case 5:
                 break;
             default:
                 cout << "\a";
                 break;
         }
-    } while (menu != 4);
+    } while (menu != 5);
 
     save_favorites();
 }

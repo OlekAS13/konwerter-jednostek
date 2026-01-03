@@ -1,0 +1,11 @@
+[KONWERSJA - Metry] Metry: 12.000000; Cale: 472.440945; Mile: 0.007456; Kilometry: 0.012000
+[KONWERSJA - Uncje] Gramy: 652.050000; Uncje: 23.000000; Funty: 1.437532; Kilogramy: 0.652050
+[KONWERSJA - Kelvin] Celsjusz: -250.150000; Farenheit: -418.270000; Kelvin: 23.000000
+[KONWERSJA - Kilometry] Metry: 123000.000000; Cale: 4842519.685039; Mile: 76.428847; Kilometry: 123.000000
+[KONWERSJA - Uncje] Gramy: 3487.050000; Uncje: 123.000000; Funty: 7.687669; Kilogramy: 3.487050
+[KONWERSJA - Celsjusz] Celsjusz: 123.000000; Farenheit: 253.400000; Kelvin: 396.150000
+[KONWERSJA - Cale] Metry: 0.076200; Cale: 3.000000; Mile: 0.000047; Kilometry: 0.000076
+[KONWERSJA WSADOWA - Metry] Metry: 100.000000; Cale: 3937.007874; Mile: 0.062137; Kilometry: 0.100000
+[KONWERSJA WSADOWA - Metry] Metry: 200.000000; Cale: 7874.015748; Mile: 0.124275; Kilometry: 0.200000
+[KONWERSJA WSADOWA - Metry] Metry: 300.000000; Cale: 11811.023622; Mile: 0.186412; Kilometry: 0.300000
+[KONWERSJA - Metry] Metry: 12.000000; Cale: 472.440945; Mile: 0.007456; Kilometry: 0.012000
