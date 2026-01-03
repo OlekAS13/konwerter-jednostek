@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -155,19 +156,25 @@ void convert_time() {
 int getMenu(string menu[], int max_pos, string prompt = ">> ") {
 	int choice;
 
-    cout << "\033[2J\033[H";
-    cout << "======================\n";
-    cout << menu[0] << endl << endl;
+    do {
+        cout << "\033[2J\033[H";
+        cout << "======================\n";
+        cout << menu[0] << endl << endl;
 
-	for (int i = 1; i < max_pos; i++) {
-		cout << i << ". " << menu[i] << endl;
-	}
+        for (int i = 1; i < max_pos; i++) {
+            cout << i << ". " << menu[i] << endl;
+        }
 
-    cout << "\n\n======================";
-	cout << "\033[1A\r";
-    cout << prompt;
+        cout << "\n\n======================";
+        cout << "\033[1A\r";
+        cout << prompt;
 
-	cin >> choice;
+        cin >> choice;
+
+        if (choice < 1 || choice >= max_pos) {
+            cout << "\a";
+        }
+    } while (choice < 1 || choice >= max_pos);
 
 	return choice;
 }
@@ -371,6 +378,14 @@ void conversion_main() {
     } while (menu != 10);
 }
 
+void save_favorites() {
+    ofstream favourites_file("favourites.txt");
+    
+    for (int i = 0; i < 5; i++) {
+        favourites_file << favourites_conversions[i][0] << " " << favourites_conversions[i][1] << endl;
+    }
+}
+
 int main() {
     int menu;
 
@@ -394,5 +409,6 @@ int main() {
         }
     } while (menu != 4);
 
+    save_favorites();
 }
 
