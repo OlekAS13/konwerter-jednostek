@@ -67,6 +67,10 @@ int favourites_conversions[5][2] = { // 5 ulubionych pozycji jako tablica 2-elem
     {3, 2}
 };
 
+void save_history(string line) {
+    ofstream history("historia_konwersji.txt", ios::app);
+    history << line << endl;
+}
 
 void convert_length(double value, int unit, double out[4]) {
     double length_factor[4] = {1.0, 0.0254, 1609.34, 1000};
@@ -91,6 +95,7 @@ void display_lengths(double lengths[], string unit) {
     cout << "\033[2A";
     cout << "\rEnter aby wyjsc... ";
 
+    save_history("[KONWERSJA - " + unit + "] Metry: " + to_string(lengths[0]) + "; Cale: " + to_string(lengths[1]) + "; Mile: " + to_string(lengths[2]) + "; Kilometry: " + to_string(lengths[3]));
     cin.ignore();
     cin.get();
 }
@@ -118,6 +123,7 @@ void display_masses(double masses[], string unit) {
     cout << "\033[2A";
     cout << "\rEnter aby wyjsc... ";
 
+    save_history("[KONWERSJA - " + unit + "] Gramy: " + to_string(masses[0]) + "; Uncje: " + to_string(masses[1]) + "; Funty: " + to_string(masses[2]) + "; Kilogramy: " + to_string(masses[3]));
     cin.ignore();
     cin.get();
 }
@@ -145,6 +151,7 @@ void display_temperatures(double temperatures[], string unit) {
     cout << "\033[2A";
     cout << "\rEnter aby wyjsc... ";
 
+    save_history("[KONWERSJA - " + unit + "] Celsjusz: " + to_string(temperatures[0]) + "; Farenheit: " + to_string(temperatures[1]) + "; Kelvin: " + to_string(temperatures[2]));
     cin.ignore();
     cin.get();
 }
