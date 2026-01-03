@@ -96,7 +96,7 @@ void display_lengths(double lengths[], string unit) {
 }
 
 void convert_mass(double value, int unit, double out[4]) {
-    double mass_factor[4] = {1.0, 28.35, 453.59, 1000}; 
+    double mass_factor[4] = {1.0, 28.35, 453.59, 1000};
     unit--; // bo przeliczniki indeksujemy od 0, natomiast menu mamy indeksowane od 1
     double grams = value * mass_factor[unit];
 
@@ -150,7 +150,7 @@ void display_temperatures(double temperatures[], string unit) {
 }
 
 void convert_time() {
-    
+
 }
 
 int getMenu(string menu[], int max_pos, string prompt = ">> ") {
@@ -263,9 +263,9 @@ void update_favorites_menu() {
 
 void modify_favorites() {
     int choice;
-    
+
     choice = getMenu(menu_favorites, 6, "Modyfikuj >> ");
-    
+
     if (choice >= 1 && choice <= 5) {
         int category = getMenu(menu_conversion, 10, "Kategoria >> ");
         int conversion;
@@ -314,10 +314,10 @@ void favourites_main() {
     do {
         menu = getMenu(menu_favorites, 9);
         switch(menu) {
-            case 1: 
-            case 2: 
-            case 3: 
-            case 4: 
+            case 1:
+            case 2:
+            case 3:
+            case 4:
             case 5:
                 if (favourites_conversions[menu - 1][0] == 0) {
                     cout << "\a";
@@ -380,14 +380,24 @@ void conversion_main() {
 
 void save_favorites() {
     ofstream favourites_file("favourites.txt");
-    
+
     for (int i = 0; i < 5; i++) {
         favourites_file << favourites_conversions[i][0] << " " << favourites_conversions[i][1] << endl;
     }
 }
 
+void load_favourites() {
+    ifstream favourites_file("favourites.txt");
+
+    for (int i = 0; i < 5; i++) {
+        favourites_file >> favourites_conversions[i][0] >> favourites_conversions[i][1];
+    }
+}
+
 int main() {
     int menu;
+
+    load_favourites();
 
     do {
         menu = getMenu(menu_main, 5);
@@ -411,4 +421,3 @@ int main() {
 
     save_favorites();
 }
-
